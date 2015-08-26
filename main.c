@@ -12,14 +12,16 @@ int ask_yes_no();
 
 int main()
 {
-	t_game game;
-	int play;
+	t_game	game;
+	int		play;
+	char*	wordlist_file_name[13];
 
+	wordlist_file_name = "wordlist.txt";
 	play = 1;
 	while(play)
 	{
 		init_game(&game);
-		start_game(&game, "CHOUCROUTE");
+		start_game(&game, wordlist_file_name);
 		while(isfinished_game(&game))
 		{
 			display_game(&game);

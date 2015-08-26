@@ -57,10 +57,44 @@ static char* init_hangman_board()
 	return board;
 }
 
-void start_game(t_game* game, char const* expected_word)
+static char* pick_word(char const* file_name)
+{
+	FILE*	wordlist;
+	char*	buff;
+	int 	nbyte;
+	int		buff_capacity;
+	int		total_readded;
+	int		readded;
+	int		word_capacity;
+	char*	words;
+
+	buff_capacity = 512;
+	word_capacity = buff_capacity;
+	buff = NULL;
+	buff = malloc(sizeof(*buff) * buff_capacity);
+	words = NULL;
+	words = malloc(sizeof(*words) * word_capacity);
+	nbyte = buff_capacity;
+	total_readded = 0;
+	wordlist = fopen(file_name, "r");
+	while((readded = read(wordlist, buff, nbyte)) > 0)
+	{
+		total_readded += readded;
+		if(total_readded > word_capacity)
+		{
+			//TODO reallouer 512 byte supplémentaire à words
+		}
+
+	}
+	fclose(wordlist);
+	free(buff);
+	free(words);
+}
+
+void start_game(t_game* game, char const* file_name)
 {
 	game->remaining_try = 7;
-	game->expected_word = strdup(expected_word);
+	game->expected_word = strdup(pick_word(file_name));
 	game->current_word = init_current_word(strlen(expected_word));
 	game->hangman_board = init_hangman_board();
 }
