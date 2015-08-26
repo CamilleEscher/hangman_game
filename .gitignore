@@ -1,0 +1,4 @@
+#ignore :
+*.out
+*.o
+*.a
