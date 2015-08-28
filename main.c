@@ -58,7 +58,7 @@ int  ask_yes_no(const char* msg, const char* err_msg)
 		}
 		ft_putstr(err_msg);
 	}
-	if(answear[0] == 'Y' && read_char > 0)
+	if(toupper(answear[0]) == 'Y' && read_char > 0)
 	{
 		res = 1;
 	}

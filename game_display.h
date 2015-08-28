@@ -1,6 +1,7 @@
 #ifndef GAME_DISPLAY_H
 #define GAME_DISPLAY_H
 #include "game.h"
+#include <string.h>
 
 void star_line_display(int length);
 void remaining_try_display(int remaining_try);

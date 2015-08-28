@@ -76,17 +76,18 @@ void destroy_game(t_game* game)
 
 void display_game(t_game const* game)
 {
-	int length;
+	int			length;
 
 	length = strlen(game->current_word);
+	ft_putchar('\n');
 	star_line_display(length);
-	ft_putchar('\n');
+	ft_putstr("\n\n");
 	remaining_try_display(game->remaining_try);
-	ft_putchar('\n');
+	ft_putstr("\n\n");
 	current_word_display(game->current_word);
-	ft_putchar('\n');
+	ft_putstr("\n\n");
 	hangman_board_display(game);
-	ft_putchar('\n');
+	ft_putstr("\n\n");
 	star_line_display(length);
 	ft_putchar('\n');
 }
