@@ -6,45 +6,27 @@
 #include <time.h>
 #include <ctype.h>
 
-static char* get_file_content(char* content, FILE* wordlist);
+static int get_element_nb(FILE* wordlist, char c);
 
-static char* reallocate(char* content, int content_capacity, int buff_capacity);
+static char* extract(FILE* wordlist, int word_index, char c);
 
-static void	buffer_strcpy(char* content, char const* buff, int total_readded, int readded);
-
-static char** split_content(char* content, char c);
-
-static int get_element_nb(char* content, char c);
-
-static char* extract_str(char* str, int start, int end);
-
-static char** ptr_array_reallocate(char** word_array, int element_nb, int size_added);
-
-static char* choose_word(char** word_array);
+static int get_random_index(int element_nb);
 
 char* pick_word(char const* file_name)
 {
 	FILE*	wordlist;
-	char*	content;
 	char*	word;
-	char**	word_array;
+	int		element_nb;
+	int		word_index;
 	int		i;
 
-	content		= NULL;
-	word_array	= NULL;
 	word		= NULL;
 	wordlist	= fopen(file_name, "r");
-	content		= get_file_content(content, wordlist);
-	word_array	= split_content(content, '\n');
-	word		= choose_word(word_array);
+	element_nb	= get_element_nb(wordlist, '\n');
+	word_index	= get_random_index(element_nb);
+	rewind(wordlist);
+	word		= extract(wordlist, word_index, '\n');
 	fclose(wordlist);
-	free(content);
-	i = -1;
-	while(word_array[++i] != NULL)
-	{
-		free(word_array[i]);
-	}
-	free(word_array);
 	i = -1;
 	while(word[++i] != '\0')
 	{
@@ -53,168 +35,78 @@ char* pick_word(char const* file_name)
 	return word;
 }
 
-static char* get_file_content(char* content, FILE* wordlist)
+static int get_element_nb(FILE* wordlist, char c)
 {
+	int		nread;
 	char*	buff;
-	int		buff_capacity;
-	int		total_readded;
-	int		readded;
-	int		content_capacity;
-	
-	buff_capacity = 512;
-	content_capacity = 0;
+	int		iread;
+	int		word;
+
 	buff = NULL;
-	buff = malloc(sizeof(*buff) * buff_capacity);
-	total_readded = 0;
-	while((readded = fread(buff, 1, buff_capacity, wordlist)) > 0)
+	buff = malloc(sizeof(*buff));
+	iread = 0;
+	word = 0;
+	while((nread = fread(buff, 1, 1, wordlist)) > 0)
 	{
-		while(total_readded + readded > content_capacity)
+		if(buff[0] == c)
 		{
-			content = reallocate(content, content_capacity, buff_capacity);
-			content_capacity += buff_capacity;
+			++iread;
+			word = 0;
 		}
-		buffer_strcpy(content, buff, total_readded, readded);
-		total_readded += readded;
+		else if(buff[0] != '\0' && word == 0)
+		{
+			word = 1;
+		}
 	}
-	content[total_readded] = '\0';
+	if(word == 1)
+	{
+		++ iread;
+	}
 	free(buff);
-	return content;
+	return iread;
 }
 
-static char* reallocate(char* content, int content_capacity, int buff_capacity)
+static char* extract(FILE* wordlist, int word_index, char c)
 {
-	char* temp;
-
-	temp = NULL;
-	temp = malloc(sizeof(*temp) * (content_capacity + buff_capacity));
-	strncpy(temp, content, content_capacity);
-	free(content);
-	return temp;
-}
-
-static void	buffer_strcpy(char* content, char const* buff, int total_readded, int readded)
-{
-	int i;
-
-	i = 0;
-	while(i < readded)
-	{
-		content[total_readded + i] = buff[i];
-		++i;
-	}
-}
-
-static char** split_content(char* content, char c)
-{
-	char**	word_array;
+	int		nread;
+	char*	buff;
+	int		iread;
+	int		ichar;
 	char*	word;
-	int		word_array_element_nb;
-	int		i;
-	int		count;
-	int		word_index;
+	int		buff_capacity;
 
+	buff = NULL;
+	buff = malloc(sizeof(*buff));
+	buff_capacity = 1;
 	word = NULL;
-	word_array = NULL;
-	count = 0;
-	word_array_element_nb = get_element_nb(content, c);
-	word_array = ptr_array_reallocate(word_array, 0, word_array_element_nb + 1);
-	i = -1;
-	word_index = 0;
-	while(content[++i] != '\0')
+	word = malloc(sizeof(*word) * 50);
+	iread = 0;
+	ichar = 0;
+	while((nread = fread(buff, 1, buff_capacity, wordlist)) > 0)
 	{
-		if(content[i] == c)
+		if(buff[0] == c)
 		{
-			word = extract_str(content, word_index, i - 1);
-			word_array[count++] = word;
-			word = NULL;
-			word_index += (i - word_index) + 1;
+			++iread;
 		}
-		else if(content[i + 1] == '\0')
+		else if(iread == word_index)
 		{
-			word = extract_str(content, word_index, i);
-			word_array[count++] = word;
-			word = NULL;
+			word[ichar++] = buff[0];
+		}
+		if(iread == word_index + 1)
+		{
+			break;
 		}
 	}
-	word_array[count] = NULL;
-	return word_array;
-}
-
-static int get_element_nb(char* content, char c)
-{
-	int		element_nb;
-	int		i;
-
-	element_nb = 0;
-	i = -1;
-	while(content[++i] != '\0')
-	{
-		if(content[i] == c || content[i + 1] == '\0')
-		{
-			++element_nb;
-		}
-	}
-	return element_nb;
-}
-
-static char** ptr_array_reallocate(char** word_array, int element_nb, int size_added)
-{
-	char**	new_word_array;
-	int		i;
-
-	new_word_array = NULL;
-	new_word_array = malloc(sizeof(*new_word_array) * (element_nb + size_added));
-	if(element_nb > 0)
-	{
-		i = -1;
-		while(++i < element_nb)
-		{
-			new_word_array[i] = word_array[i];
-		}
-		free(word_array);
-		word_array = NULL;
-	}
-	return new_word_array;
-}
-
-static char* extract_str(char* str, int start, int end)
-{
-	char*	extracted_str;
-	int		i;
-	int		count;
-
-	count = 0;
-	extracted_str = NULL;
-	if(start >= 0 && start <= end && end < (int)strlen(str))
-	{
-		extracted_str = malloc(sizeof(*extracted_str) * (end - start + 2));
-		i = start - 1;
-		while(++i <= end)
-		{
-			extracted_str[count++] = str[i];
-		}
-		extracted_str[count] = '\0';
-	}
-	return extracted_str;
-}
-
-
-static char* choose_word(char** word_array)
-{
-	char*	word;
-	int		iword;
-	int		length;
-	int		i;
-
-	word = NULL;
-	i = -1;
-	length = 0;
-	while(word_array[++i] != NULL)
-	{
-		++length;
-	}
-	srand(time(NULL));
-	iword = rand() % length;
-	word = strdup(word_array[iword]);
+	word[ichar] = '\0';
+	free(buff);
 	return word;
+}
+
+static int get_random_index(int element_nb)
+{
+	int		iword;
+
+	srand(time(NULL));
+	iword = rand() % element_nb;
+	return iword;
 }
