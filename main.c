@@ -14,9 +14,8 @@ int main()
 {
 	t_game	game;
 	int		play;
-	char*	wordlist_file_name[13];
+	char*	wordlist_file_name = "wordlist.txt";
 
-	wordlist_file_name = "wordlist.txt";
 	play = 1;
 	while(play)
 	{
