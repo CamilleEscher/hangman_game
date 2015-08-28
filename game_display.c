@@ -7,24 +7,24 @@ void star_line_display(int length)
 {
 	int	i;
 
-	ft_putstr("\033[4;36m");
+print_color_code(1, (UL | BOLD), NONE, CYAN);
 	i = 0;
 	while(i < length * 4)
 	{
 		ft_putchar('*');
 		++i;
 	}
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 	ft_putchar('\n');
 }
 
 void remaining_try_display(int remaining_try)
 {
-	ft_putstr("\033[0;36m");
+	print_color_code(1, NORMAL, NONE, CYAN);
 	ft_putstr("REMAINING TRIES : ");
-	ft_putstr("\033[1;33m");
+	print_color_code(1, BOLD, NONE, YELLOW);
 	ft_putchar(remaining_try + '0');
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 	ft_putchar('\n');
 }
 
@@ -33,7 +33,7 @@ void current_word_display(char const* current_word)
 	int i;
 
 	ft_putstr("\t\t");
-	ft_putstr("\033[1;77;34m");
+	print_color_code(1, BOLD, NONE, BLUE);
 	i = 0;
 	while(current_word[i] != '\0')
 	{
@@ -41,7 +41,7 @@ void current_word_display(char const* current_word)
 		ft_putchar(' ');
 		++i;
 	}
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 	ft_putchar('\n');
 }
 
@@ -49,10 +49,10 @@ void congrats_display()
 {
 	ft_putchar('\t');
 	star_line_display(33 / 4);
-	ft_putstr("\033[1;33m");
+	print_color_code(1, BOLD, NONE, YELLOW);
 	ft_putstr("\t** Congratulation ! You WIN ! **\n");
 	ft_putchar('\t');
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 	star_line_display(33 / 4);
 	ft_putchar('\n');
 }
@@ -62,13 +62,13 @@ static void percentage_line_display(int length)
 	int i;
 
 	i = 0;
-	ft_putstr("\033[0;36m");
+	print_color_code(1, NORMAL, NONE, CYAN);
 	while(i < length)
 	{
 		ft_putchar('%');
 		++i;
 	}
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 	ft_putchar('\n');
 }
 
@@ -76,10 +76,10 @@ void hangman_display(t_game const* game)
 {
 	ft_putchar('\t');
 	percentage_line_display(26);
-	ft_putstr("\033[1;31m");
+	print_color_code(1, BOLD, NONE, RED);
 	ft_putstr("\t%% Sorry, you LOOSE ... %%\n");
 	ft_putchar('\t');
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 	percentage_line_display(26);
 	ft_putstr("\nThe word to find was : \n");
 	current_word_display(game->expected_word);
@@ -90,7 +90,7 @@ void hangman_board_display(t_game const* game)
 {
 	int i;
 
-	ft_putstr("\033[1;33m");
+	print_color_code(1, BOLD, NONE, YELLOW);
 	i = 0;
 	while(game->hangman_board[i] != '\0')
 	{
@@ -101,5 +101,5 @@ void hangman_board_display(t_game const* game)
 		}
 		++i;
 	}
-	ft_putstr("\033[0m");
+	print_color_code(1, NORMAL, NONE, NONE);
 }
