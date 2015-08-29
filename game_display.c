@@ -7,7 +7,7 @@ void star_line_display(int length)
 {
 	int	i;
 
-print_color_code(1, (UL | BOLD), NONE, CYAN);
+	print_color_code(1, (UL | BOLD), NONE, CYAN);
 	i = 0;
 	while(i < length * 4)
 	{

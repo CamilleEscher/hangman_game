@@ -2,9 +2,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> //
+#include <unistd.h>
 #include <time.h>
 #include <ctype.h>
+#include <unistd.h> //
 
 static int get_element_nb(FILE* wordlist, char c);
 
@@ -12,11 +13,9 @@ static char* extract(FILE* wordlist, int word_index, char c);
 
 static int get_random_index(int element_nb);
 
-static void print_unknown_file();
+static void print_unknown_file(char const* file_name);
 
-static void print_empty_file();
-
-static void toupper_str(char* word);
+static void print_empty_file(char const* file_name);
 
 char* pick_word(char const* file_name)
 {
@@ -26,6 +25,7 @@ char* pick_word(char const* file_name)
 	int		word_index;
 
 	word	= NULL;
+	wordlist = NULL;
 	if((wordlist = fopen(file_name, "r")) != NULL)
 	{
 		if((element_nb = get_element_nb(wordlist, '\n')) != 0)
@@ -33,71 +33,62 @@ char* pick_word(char const* file_name)
 			word_index = get_random_index(element_nb);
 			rewind(wordlist);
 			word = extract(wordlist, word_index, '\n');
-			fclose(wordlist);
-			toupper_str(word);
 		}
 		else
 		{
-			print_empty_file();
+			print_empty_file(file_name);
 		}
+		fclose(wordlist);
 	}
 	else
 	{
-		print_unknown_file();
+		print_unknown_file(file_name);
 	}
 	return word;
 }
 
-static void toupper_str(char* word)
+static void print_unknown_file(char const* file_name)
 {
-	int i;
-
-	i = -1;
-	while(word[++i] != '\0')
-	{
-		word[i] = toupper(word[i]);
-	}
-}
-
-static void print_unknown_file()
-{
-	char const* msg = "The specified file \"wordlist.txt\" was not found\n";
-
+	char const* msg = "The specified file \"";
+	char const* end_msg = "\" was not found\n";
+	
 	write(1, msg, strlen(msg));
+	write(1, file_name, strlen(file_name));
+	write(1, end_msg, strlen(end_msg));
 }
 
-static void print_empty_file()
+static void print_empty_file(char const* file_name)
 {
-	char const* msg = "The specified file \"wordlist.txt\" is empty\n";
-
+	char const* msg = "The specified file \"";
+	char const* end_msg = "\" is empty\n";
+	
 	write(1, msg, strlen(msg));
+	write(1, file_name, strlen(file_name));
+	write(1, end_msg, strlen(end_msg));
 }
+
 static int get_element_nb(FILE* wordlist, char c)
 {
 	int		nread;
 	char*	buff;
 	int		iread;
-	int		word;
+	int		word_length;
 
 	buff = NULL;
 	buff = malloc(sizeof(*buff));
 	iread = 0;
-	word = 0;
+	word_length = 0;
 	while((nread = fread(buff, 1, 1, wordlist)) > 0)
 	{
-		if(buff[0] == c)
+		if((buff[0] == c || buff[0] == '\0') && word_length > 0)
 		{
 			++iread;
-			word = 0;
+			word_length = 0;
 		}
-		else if(buff[0] != '\0' && word == 0)
+		else if(buff[0] != '\0' && ((buff[0] >= 'A' && buff[0] <= 'z') || (buff[0] == '-' && word_length > 0)))
 		{
-			word = 1;
+			++word_length;
 		}
-	}
-	if(word == 1)
-	{
-		++ iread;
 	}
 	free(buff);
 	return iread;
@@ -108,33 +99,36 @@ static char* extract(FILE* wordlist, int word_index, char c)
 	int		nread;
 	char*	buff;
 	int		iread;
-	int		ichar;
+	int		word_length;
 	char*	word;
-	int		buff_capacity;
 
 	buff = NULL;
 	buff = malloc(sizeof(*buff));
-	buff_capacity = 1;
 	word = NULL;
 	word = malloc(sizeof(*word) * 50);
 	iread = 0;
-	ichar = 0;
-	while((nread = fread(buff, 1, buff_capacity, wordlist)) > 0)
+	word_length = 0;
+	while((nread = fread(buff, 1, 1, wordlist)) > 0)
 	{
-		if(buff[0] == c)
+		if(buff[0] == c && word_length > 0)
 		{
 			++iread;
+			if(iread > word_index)
+			{
+				break;
+			}
+			word_length = 0;
 		}
-		else if(iread == word_index)
+		else if(buff[0] != '\0' && ((buff[0] >= 'A' && buff[0] <= 'z') || buff[0] == '-'))
 		{
-			word[ichar++] = buff[0];
-		}
-		if(iread == word_index + 1)
-		{
-			break;
+			if(iread == word_index)
+			{
+				word[word_length] = toupper(buff[0]);
+			}
+			++word_length;
 		}
 	}
-	word[ichar] = '\0';
+	word[word_length] = '\0';
 	free(buff);
 	return word;
 }

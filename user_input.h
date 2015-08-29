@@ -1,5 +1,7 @@
 #ifndef USER_ENTRY_H
 #define USER_ENTRY_H
+#include "game.h"
 
-char* get_user_input(int length);
+void get_user_input(t_game* game, int length);
+
 #endif

@@ -11,6 +11,7 @@ typedef struct	s_game
 	char*	expected_word;
 	char*	current_word;
 	char*	hangman_board;
+	char*	user_input;
 }				t_game;
 
 void	init_game(t_game* game);

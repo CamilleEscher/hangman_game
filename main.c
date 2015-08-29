@@ -33,7 +33,6 @@ int main()
 	{
 		init_game(&game);
 		start_game(&game, wordlist_file_name);
-		check_word(&game);
 		while(isfinished_game(&game))
 		{
 			display_game(&game);

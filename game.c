@@ -5,6 +5,7 @@
 #include "word_list_process.h"
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h> //
 
 void init_game(t_game* game)
 {
@@ -64,18 +65,23 @@ void start_game(t_game* game, char const* file_name)
 	if((game->expected_word = pick_word(file_name)) != NULL)
 	{
 		game->current_word = init_current_word(strlen(game->expected_word));
+		game->hangman_board = init_hangman_board();
 	}
-	game->hangman_board = init_hangman_board();
+	check_word(game);
 }
 
 void destroy_game(t_game* game)
 {
 	if(game->expected_word != NULL)
 	{
-		free(game->expected_word);
+		free(game->hangman_board);
 		free(game->current_word);
+		free(game->expected_word);
+		if(game->user_input != NULL)
+		{
+			free(game->user_input);
+		}
 	}
-	free(game->hangman_board);
 	bzero(game, sizeof(*game));
 }
 
@@ -138,19 +144,19 @@ static int check_letter(t_game* game, char const* user_input)
 	return res;
 }
 
-static int check_input_word(t_game* game, char const* user_input)
+static int check_input_word(t_game* game)
 {
 	int res;
 
 	res = 0;
-	if(strcmp(game->expected_word, user_input) == 0)
+	if(strcmp(game->expected_word, game->user_input) == 0)
 	{
 		strcpy(game->current_word, game->expected_word);
 		res = 1;
 	}
-	else if(strlen(user_input) == 1)
+	else if(strlen(game->user_input) == 1)
 	{
-		res = check_letter(game, user_input);
+		res = check_letter(game, game->user_input);
 	}
 	return res;
 }
@@ -196,17 +202,19 @@ static void update_hangman_board(t_game* game)
 
 void update_game(t_game* game)
 {
-	char*	user_input;
 	int		success;
 
-	user_input = NULL;
-	user_input = get_user_input(strlen(game->expected_word));
-	success = check_input_word(game, user_input);
+	get_user_input(game, strlen(game->expected_word));
+	success = check_input_word(game);
+	if(game->user_input != NULL)
+	{
+		free(game->user_input);
+		game->user_input = NULL;
+	}
 	if(success == 0)
 	{
 		game->remaining_try -= 1;
 	}
-	free(user_input);
 	update_hangman_board(game);
 	is_won_game(game);
 }
