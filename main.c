@@ -5,17 +5,29 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <signal.h>
+
+static t_game game;
 
 int ask_restart();
 
 int ask_yes_no();
 
+void interrupt(int signum)
+{
+	destroy_game(&game);
+	ft_putstr("\nProcessus interrupted by : ");
+	ft_putchar((char)(signum + '0'));
+	ft_putchar('\n');
+	exit(0);
+}
+
 int main()
 {
-	t_game	game;
 	int		play;
 	char*	wordlist_file_name = "wordlist.txt";
 
+	signal(SIGINT, interrupt);
 	play = 1;
 	while(play)
 	{
