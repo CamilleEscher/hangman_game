@@ -12,29 +12,66 @@ static char* extract(FILE* wordlist, int word_index, char c);
 
 static int get_random_index(int element_nb);
 
+static void print_unknown_file();
+
+static void print_empty_file();
+
+static void toupper_str(char* word);
+
 char* pick_word(char const* file_name)
 {
 	FILE*	wordlist;
 	char*	word;
 	int		element_nb;
 	int		word_index;
-	int		i;
 
-	word		= NULL;
-	wordlist	= fopen(file_name, "r");
-	element_nb	= get_element_nb(wordlist, '\n');
-	word_index	= get_random_index(element_nb);
-	rewind(wordlist);
-	word		= extract(wordlist, word_index, '\n');
-	fclose(wordlist);
+	word	= NULL;
+	if((wordlist = fopen(file_name, "r")) != NULL)
+	{
+		if((element_nb = get_element_nb(wordlist, '\n')) != 0)
+		{
+			word_index = get_random_index(element_nb);
+			rewind(wordlist);
+			word = extract(wordlist, word_index, '\n');
+			fclose(wordlist);
+			toupper_str(word);
+		}
+		else
+		{
+			print_empty_file();
+		}
+	}
+	else
+	{
+		print_unknown_file();
+	}
+	return word;
+}
+
+static void toupper_str(char* word)
+{
+	int i;
+
 	i = -1;
 	while(word[++i] != '\0')
 	{
 		word[i] = toupper(word[i]);
 	}
-	return word;
 }
 
+static void print_unknown_file()
+{
+	char const* msg = "The specified file \"wordlist.txt\" was not found\n";
+
+	write(1, msg, strlen(msg));
+}
+
+static void print_empty_file()
+{
+	char const* msg = "The specified file \"wordlist.txt\" is empty\n";
+
+	write(1, msg, strlen(msg));
+}
 static int get_element_nb(FILE* wordlist, char c)
 {
 	int		nread;

@@ -61,17 +61,31 @@ static char* init_hangman_board()
 void start_game(t_game* game, char const* file_name)
 {
 	game->remaining_try = 7;
-	game->expected_word = pick_word(file_name);
-	game->current_word = init_current_word(strlen(game->expected_word));
+	if((game->expected_word = pick_word(file_name)) != NULL)
+	{
+		game->current_word = init_current_word(strlen(game->expected_word));
+	}
 	game->hangman_board = init_hangman_board();
 }
 
 void destroy_game(t_game* game)
 {
-	free(game->expected_word);
-	free(game->current_word);
+	if(game->expected_word != NULL)
+	{
+		free(game->expected_word);
+		free(game->current_word);
+	}
 	free(game->hangman_board);
 	bzero(game, sizeof(*game));
+}
+
+void check_word(t_game* game)
+{
+	if(game->expected_word == NULL)
+	{
+		destroy_game(game);
+		exit(0);
+	}
 }
 
 void display_game(t_game const* game)
@@ -124,7 +138,7 @@ static int check_letter(t_game* game, char const* user_input)
 	return res;
 }
 
-static int check_word(t_game* game, char const* user_input)
+static int check_input_word(t_game* game, char const* user_input)
 {
 	int res;
 
@@ -187,7 +201,7 @@ void update_game(t_game* game)
 
 	user_input = NULL;
 	user_input = get_user_input(strlen(game->expected_word));
-	success = check_word(game, user_input);
+	success = check_input_word(game, user_input);
 	if(success == 0)
 	{
 		game->remaining_try -= 1;

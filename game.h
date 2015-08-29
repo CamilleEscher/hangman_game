@@ -15,6 +15,7 @@ typedef struct	s_game
 
 void	init_game(t_game* game);
 void	start_game(t_game* game, char const* file_name);
+void	check_word(t_game* game);
 void	destroy_game(t_game* game);	
 void	display_game(t_game const* game);
 void	update_game(t_game* game);
