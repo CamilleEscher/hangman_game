@@ -1,4 +1,4 @@
 #ignore :
-*.out
+hangman
 *.o
 *.a
