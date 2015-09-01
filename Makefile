@@ -32,7 +32,7 @@ word_list_process.o : word_list_process.c word_list_process.h
 re : fclean $(NAME)
 
 fclean : clean
-	rm ./hangman
+	rm -f ./hangman
 
 clean : 
 	rm -f *.o

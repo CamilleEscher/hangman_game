@@ -20,25 +20,26 @@ void get_user_input(t_game* game, int length)
 
 static void get_input(t_game* game, int read_size)
 {
-	//char*	user_input;
 	int 	readded;
 	char	buffer_un;
 
-	//user_input = NULL;
 	game->user_input = malloc(sizeof(*(game->user_input)) * read_size);
-	ft_putstr("Enter a letter or the complete word and press Enter\n");
-	if((readded = read(0, game->user_input, read_size)) > 0)
+	do
 	{
-		if(game->user_input[readded - 1] == '\n')
+		ft_putstr("Enter a letter or the complete word and press Enter\n");
+		if((readded = read(0, game->user_input, read_size)) > 0)
 		{
-			game->user_input[readded - 1] = '\0';
-		}
-		else
-		{
-			while((readded = read(0, &buffer_un, 1)) != '\n');
+			if(game->user_input[readded - 1] == '\n')
+			{
+				game->user_input[readded - 1] = '\0';
+			}
+			else
+			{
+				while((readded = read(0, &buffer_un, 1)) != '\n');
+			}
 		}
 	}
-	//return user_input;
+	while(game->user_input[0] == '\0');
 }
 
 static void format_data(char* user_input)

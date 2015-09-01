@@ -7,9 +7,9 @@ void star_line_display(int length)
 {
 	int	i;
 
-	print_color_code(1, (UL | BOLD), NONE, CYAN);
+	print_color_code(1, (UL | BOLD), NONE, NONE);
 	i = 0;
-	while(i < length * 4)
+	while(i < length + 100)
 	{
 		ft_putchar('*');
 		++i;
@@ -48,7 +48,7 @@ void current_word_display(char const* current_word)
 void congrats_display()
 {
 	ft_putchar('\t');
-	star_line_display(33 / 4);
+	star_line_display(33 - 100);
 	print_color_code(1, BOLD, NONE, YELLOW);
 	ft_putstr("\t** Congratulation ! You WIN ! **\n");
 	ft_putchar('\t');
