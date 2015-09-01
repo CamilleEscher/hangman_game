@@ -49,8 +49,8 @@ int ask_restart()
 {
 	int res;
 
-	res = ask_yes_no(	"Do you want to restart the game ? (Answear Y or N and press enter)\n", 
-						"I did not understand your answear : it must be Y or N (don't forget to press enter)\n");
+	res = ask_yes_no(	"restart ? (y or n)\n", 
+						"enter y or n (and press enter)\n");
 	return res;
 }
 

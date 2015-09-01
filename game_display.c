@@ -20,7 +20,7 @@ void star_line_display(int length)
 
 void remaining_try_display(int remaining_try)
 {
-	print_color_code(1, NORMAL, NONE, CYAN);
+	print_color_code(1, NORMAL, NONE, NONE);
 	ft_putstr("REMAINING TRIES : ");
 	print_color_code(1, BOLD, NONE, YELLOW);
 	ft_putchar(remaining_try + '0');
